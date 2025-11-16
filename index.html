@@ -1,1 +1,934 @@
 
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Mockup Ringkas - Eraser Presisi</title>
+<style>
+:root {
+  --accent: #0b66ff;
+  --toolbar-bg: #f1f5f9;
+  --panel-bg: #fff;
+  --border-color: #e2e8f0;
+}
+
+body {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f6f7fb;
+  color: #0b0b0b;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.header {
+  background: var(--panel-bg);
+  border-bottom: 1px solid var(--border-color);
+  padding: 8px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.toolbar {
+  display: flex;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--toolbar-bg);
+  border-bottom: 1px solid var(--border-color);
+  flex-wrap: nowrap;
+  align-items: center;
+  overflow-x: auto;
+}
+
+.tool-icon {
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.tool-icon:hover {
+  background: #e6eefc;
+  border-color: var(--accent);
+}
+
+.tool-icon.active {
+  background: #e6eefc;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.workspace {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #fff, #fafafa);
+  padding: 20px;
+  overflow: auto;
+}
+
+canvas {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.06);
+  max-width: 100%;
+  height: auto;
+}
+
+.control-panel {
+  background: var(--panel-bg);
+  border-top: 1px solid var(--border-color);
+  padding: 12px 16px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  position: relative;
+}
+
+.control-panel.active {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.panel-toggle {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  padding: 4px 12px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #666;
+  z-index: 10;
+}
+
+.panel-slider {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 6px;
+  background: #ddd;
+  border-radius: 3px;
+  cursor: ns-resize;
+  z-index: 5;
+}
+
+.control-group {
+  margin-bottom: 12px;
+}
+
+.control-group label {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 6px;
+  color: #444;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+input[type=range] {
+  flex: 1;
+}
+
+button {
+  background: var(--accent);
+  color: #fff;
+  border: 0;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+button.secondary {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.step {
+  background: #e6eefc;
+  border: 1px solid #d0e4ff;
+  color: #0b66ff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.badge {
+  background: #f1f5f9;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.controls-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.footer {
+  font-size: 12px;
+  color: #666;
+  padding: 8px 16px;
+  background: var(--toolbar-bg);
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.hidden {
+  display: none;
+}
+
+.small {
+  font-size: 12px;
+  color: #666;
+}
+
+.undo-redo-container {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+/* Scrollbar styling for toolbar */
+.toolbar::-webkit-scrollbar {
+  height: 4px;
+}
+
+.toolbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 2px;
+}
+
+.toolbar::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 2px;
+}
+
+.toolbar::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h3 style="margin: 0; font-size: 16px;">Mockup Ringkas - Eraser Presisi</h3>
+  <div style="display: flex; gap: 8px;">
+    <button id="downloadBtn">Download PNG</button>
+    <button id="resetBtn" class="secondary">Reset All</button>
+  </div>
+</div>
+
+<div class="toolbar">
+  <div class="tool-icon" data-panel="uploadPanel" title="Upload Gambar">
+    📁
+  </div>
+  <div class="tool-icon" data-panel="transformPanel" title="Transformasi">
+    ↔️
+  </div>
+  <div class="tool-icon" data-panel="displacePanel" title="Displacement">
+    🌊
+  </div>
+  <div class="tool-icon" data-panel="eraserPanel" title="Eraser">
+    🧽
+  </div>
+  
+  <div class="undo-redo-container">
+    <div class="tool-icon" id="undoBtn" title="Undo" style="background:#f39c12">↶</div>
+    <div class="tool-icon" id="redoBtn" title="Redo" style="background:#f39c12">↷</div>
+  </div>
+</div>
+
+<div class="main-content">
+  <div class="workspace">
+    <canvas id="c" width="900" height="1100" aria-label="mockup canvas"></canvas>
+  </div>
+  
+  <!-- Panel kontrol di bawah lembar kerja -->
+  <div id="uploadPanel" class="control-panel hidden">
+    <div class="panel-slider"></div>
+    <div class="panel-toggle">▲</div>
+    <div class="control-group">
+      <label>Upload Gambar</label>
+      <div class="row">
+        <input id="shirtFile" type="file" accept="image/*" style="flex:1">
+        <span style="font-size:12px; color:#666">Baju (PNG)</span>
+      </div>
+      <div class="row">
+        <input id="patternFile" type="file" accept="image/*" style="flex:1">
+        <span style="font-size:12px; color:#666">Motif</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="transformPanel" class="control-panel hidden">
+    <div class="panel-slider"></div>
+    <div class="panel-toggle">▲</div>
+    <div class="control-group">
+      <label>Transformasi</label>
+      
+      <div class="row">
+        <span style="width:56px">Pos X</span>
+        <button class="step" data-target="posX" data-step="-10">−</button>
+        <input id="posX" type="range" min="-2000" max="2000" value="450">
+        <button class="step" data-target="posX" data-step="10">+</button>
+      </div>
+
+      <div class="row">
+        <span style="width:56px">Pos Y</span>
+        <button class="step" data-target="posY" data-step="-10">−</button>
+        <input id="posY" type="range" min="-2000" max="2000" value="550">
+        <button class="step" data-target="posY" data-step="10">+</button>
+      </div>
+
+      <div class="row">
+        <span style="width:56px">Scale</span>
+        <button class="step" data-target="scale" data-step="-0.05">−</button>
+        <input id="scale" type="range" min="0.1" max="5" step="0.01" value="1">
+        <button class="step" data-target="scale" data-step="0.05">+</button>
+      </div>
+
+      <div class="row">
+        <span style="width:56px">Rotasi</span>
+        <button class="step" data-target="rotation" data-step="-1">−</button>
+        <input id="rotation" type="range" min="-180" max="180" value="0">
+        <button class="step" data-target="rotation" data-step="1">+</button>
+      </div>
+
+      <div class="row">
+        <span style="width:56px">Opacity</span>
+        <button class="step" data-target="opacity" data-step="-0.01">−</button>
+        <input id="opacity" type="range" min="0" max="1" step="0.01" value="1">
+        <button class="step" data-target="opacity" data-step="0.01">+</button>
+      </div>
+
+      <div class="controls-grid">
+        <div><button id="centerBtn" style="width:100%">Center</button></div>
+        <div><button id="tileBtn" style="width:100%">Toggle Tile</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="displacePanel" class="control-panel hidden">
+    <div class="panel-slider"></div>
+    <div class="panel-toggle">▲</div>
+    <div class="control-group">
+      <label>Displacement</label>
+      <div class="row">
+        <div style="display:flex;align-items:center;gap:8px">
+          <input id="displaceToggle" type="checkbox">
+          <span style="font-size:13px">Aktifkan</span>
+        </div>
+        <div style="flex:1;display:flex;align-items:center;gap:8px">
+          <button class="step" data-target="displaceStrength" data-step="-1">−</button>
+          <input id="displaceStrength" type="range" min="0" max="120" value="18">
+          <button class="step" data-target="displaceStrength" data-step="1">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="eraserPanel" class="control-panel hidden">
+    <div class="panel-slider"></div>
+    <div class="panel-toggle">▲</div>
+    <div class="control-group">
+      <label>Eraser</label>
+      <div class="row">
+        <button id="eraserBtn">Eraser</button>
+        <button id="resetEraseBtn" style="background:#e53e3e">Reset Erase</button>
+      </div>
+      
+      <div class="row">
+        <div class="badge">Size
+          <button class="step" data-target="brushSize" data-step="-4">−</button>
+          <input id="brushSize" type="range" min="4" max="200" value="40" style="width:100px">
+          <button class="step" data-target="brushSize" data-step="4">+</button>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="badge">Hard
+          <button class="step" data-target="brushHard" data-step="-0.05">−</button>
+          <input id="brushHard" type="range" min="0" max="1" step="0.01" value="0.6" style="width:100px">
+          <button class="step" data-target="brushHard" data-step="0.05">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  Tip: Pinch untuk zoom halaman. Eraser nonaktif jika lebih dari 1 sentuhan.
+</div>
+
+<script>
+// Inisialisasi panel kontrol
+let activeTool = null;
+let activePanel = null;
+let isResizingPanel = false;
+
+document.querySelectorAll('.tool-icon[data-panel]').forEach(icon => {
+  icon.addEventListener('click', function() {
+    const panelId = this.getAttribute('data-panel');
+    const panel = document.getElementById(panelId);
+    
+    // Jika panel yang sama diklik lagi, sembunyikan
+    if (this.classList.contains('active')) {
+      this.classList.remove('active');
+      panel.classList.remove('active');
+      panel.classList.add('hidden');
+      activeTool = null;
+      activePanel = null;
+    } else {
+      // Nonaktifkan semua ikon dan sembunyikan semua panel
+      document.querySelectorAll('.tool-icon[data-panel]').forEach(i => {
+        i.classList.remove('active');
+      });
+      document.querySelectorAll('.control-panel').forEach(p => {
+        p.classList.remove('active');
+        p.classList.add('hidden');
+      });
+      
+      // Aktifkan ikon dan panel yang dipilih
+      this.classList.add('active');
+      panel.classList.remove('hidden');
+      panel.classList.add('active');
+      activeTool = panelId;
+      activePanel = panel;
+    }
+  });
+});
+
+// Tombol toggle panel
+document.querySelectorAll('.panel-toggle').forEach(toggle => {
+  toggle.addEventListener('click', function() {
+    const panel = this.parentElement;
+    panel.classList.toggle('active');
+    panel.classList.toggle('hidden');
+    
+    // Update ikon toggle
+    this.textContent = panel.classList.contains('active') ? '▲' : '▼';
+    
+    // Jika panel ditutup, nonaktifkan ikon terkait
+    if (panel.classList.contains('hidden')) {
+      document.querySelectorAll('.tool-icon[data-panel]').forEach(icon => {
+        if (icon.getAttribute('data-panel') === panel.id) {
+          icon.classList.remove('active');
+        }
+      });
+    }
+  });
+});
+
+// Slider untuk mengatur tinggi panel
+document.querySelectorAll('.panel-slider').forEach(slider => {
+  slider.addEventListener('mousedown', function(e) {
+    isResizingPanel = true;
+    const panel = this.parentElement;
+    const startY = e.clientY;
+    const startHeight = parseInt(document.defaultView.getComputedStyle(panel).maxHeight, 10);
+    
+    function doResize(e) {
+      if (!isResizingPanel) return;
+      const newHeight = startHeight + (startY - e.clientY);
+      if (newHeight > 100 && newHeight < 500) {
+        panel.style.maxHeight = newHeight + 'px';
+      }
+    }
+    
+    function stopResize() {
+      isResizingPanel = false;
+      document.removeEventListener('mousemove', doResize);
+      document.removeEventListener('mouseup', stopResize);
+    }
+    
+    document.addEventListener('mousemove', doResize);
+    document.addEventListener('mouseup', stopResize);
+    e.preventDefault();
+  });
+});
+
+// Kode JavaScript dari file asli (dengan penyesuaian untuk struktur baru)
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+
+let shirtImg = null, patternImg = null, maskCanvas = null, lumMap = null;
+let patternState = { x: c.width/2, y: c.height/2, scale:1, rot:0, alpha:1, tiled:false };
+
+// erase mask
+const eraseMask = document.createElement('canvas');
+let eraseMaskCtx = eraseMask.getContext('2d');
+const undoStack = [];
+const redoStack = [];
+const UNDO_LIMIT = 20;
+
+// pointer tracking for multi-touch detection
+const activePointers = new Set();
+
+let eraserActive = true;
+let isErasing = false;
+let dragging = false;
+let dragOffset = {x:0,y:0};
+let lastPointerId = null;
+
+// UI refs
+const shirtFile = document.getElementById('shirtFile');
+const patternFile = document.getElementById('patternFile');
+const posX = document.getElementById('posX');
+const posY = document.getElementById('posY');
+const scaleEl = document.getElementById('scale');
+const rotationEl = document.getElementById('rotation');
+const opacityEl = document.getElementById('opacity');
+const centerBtn = document.getElementById('centerBtn');
+const tileBtn = document.getElementById('tileBtn');
+const displaceToggle = document.getElementById('displaceToggle');
+const displaceStrength = document.getElementById('displaceStrength');
+const downloadBtn = document.getElementById('downloadBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+const eraserBtn = document.getElementById('eraserBtn');
+const brushSizeEl = document.getElementById('brushSize');
+const brushHardEl = document.getElementById('brushHard');
+const undoBtn = document.getElementById('undoBtn');
+const redoBtn = document.getElementById('redoBtn');
+const resetEraseBtn = document.getElementById('resetEraseBtn');
+
+// initialize undo/redo buttons
+undoBtn.disabled = true;
+redoBtn.disabled = true;
+
+// helpers
+function ensureEraseMaskSize(w,h){
+  if(eraseMask.width !== w || eraseMask.height !== h){
+    eraseMask.width = w; eraseMask.height = h;
+    eraseMaskCtx = eraseMask.getContext('2d');
+    eraseMaskCtx.clearRect(0,0,w,h);
+    eraseMaskCtx.fillStyle = 'white';
+    eraseMaskCtx.fillRect(0,0,w,h);
+    undoStack.length = 0;
+    redoStack.length = 0;
+    undoBtn.disabled = true;
+    redoBtn.disabled = true;
+  }
+}
+
+function loadImageFromFile(file, cb){
+  const r = new FileReader();
+  r.onload = e=>{
+    const img = new Image();
+    img.onload = ()=>cb(img);
+    img.src = e.target.result;
+  };
+  r.readAsDataURL(file);
+}
+
+// file events
+shirtFile.addEventListener('change', e=>{
+  const f = e.target.files[0]; if(!f) return;
+  loadImageFromFile(f, img=>{
+    shirtImg = img;
+    fitCanvasToShirt();
+    generateMaskFromShirt();
+    computeLuminanceMap();
+    ensureEraseMaskSize(c.width, c.height);
+    draw();
+  });
+});
+
+patternFile.addEventListener('change', e=>{
+  const f = e.target.files[0]; if(!f) return;
+  loadImageFromFile(f, img=>{
+    patternImg = img;
+    patternState.x = c.width/2; patternState.y = c.height/2; patternState.scale = 1; patternState.rot = 0; patternState.alpha = 1; patternState.tiled = false;
+    syncUI();
+    ensureEraseMaskSize(c.width, c.height);
+    draw();
+  });
+});
+
+// fit canvas to shirt
+function fitCanvasToShirt(){
+  if(!shirtImg) return;
+  const maxW=1400, maxH=1700;
+  let w = shirtImg.naturalWidth || shirtImg.width;
+  let h = shirtImg.naturalHeight || shirtImg.height;
+  const ratio = Math.min(maxW / w, maxH / h, 1);
+  c.width = Math.round(w * ratio);
+  c.height = Math.round(h * ratio);
+  ensureEraseMaskSize(c.width, c.height);
+  if(!patternImg){ patternState.x = c.width/2; patternState.y = c.height/2; }
+  syncUI();
+}
+
+// mask from shirt alpha
+function generateMaskFromShirt(){
+  if(!shirtImg){ maskCanvas = null; return; }
+  const tmp = document.createElement('canvas'); tmp.width=c.width; tmp.height=c.height;
+  const tctx = tmp.getContext('2d'); tctx.clearRect(0,0,tmp.width,tmp.height);
+  tctx.drawImage(shirtImg,0,0,tmp.width,tmp.height);
+  const id = tctx.getImageData(0,0,tmp.width,tmp.height).data;
+  const mask = document.createElement('canvas'); mask.width=tmp.width; mask.height=tmp.height;
+  const mctx = mask.getContext('2d'), mImg = mctx.createImageData(tmp.width,tmp.height);
+  const mData = mImg.data;
+  const TH = 10;
+  for(let i=0;i<id.length;i+=4){
+    const a = id[i+3];
+    if(a>TH){ mData[i]=255; mData[i+1]=255; mData[i+2]=255; mData[i+3]=255; } else { mData[i]=0; mData[i+1]=0; mData[i+2]=0; mData[i+3]=0; }
+  }
+  mctx.putImageData(mImg,0,0);
+  maskCanvas = mask;
+}
+
+// luminance map
+function computeLuminanceMap(){
+  if(!shirtImg){ lumMap=null; return; }
+  const tmp = document.createElement('canvas'); tmp.width=c.width; tmp.height=c.height;
+  const tctx = tmp.getContext('2d'); tctx.drawImage(shirtImg,0,0,tmp.width,tmp.height);
+  const id = tctx.getImageData(0,0,tmp.width,tmp.height).data;
+  lumMap = new Float32Array(tmp.width*tmp.height);
+  for(let i=0,j=0;i<id.length;i+=4,j++){ lumMap[j] = (0.2126*id[i] + 0.7152*id[i+1] + 0.0722*id[i+2]) / 255; }
+  lumMap = boxBlurFloat(lumMap, tmp.width, tmp.height, 2);
+}
+function boxBlurFloat(arr,w,h,radius){ if(radius<1) return arr; const tmp=new Float32Array(arr.length); for(let y=0;y<h;y++) for(let x=0;x<w;x++){ let sum=0,cnt=0; for(let k=-radius;k<=radius;k++){ const xx=x+k; if(xx>=0 && xx<w){ sum+=arr[y*w+xx]; cnt++; } } tmp[y*w+x]=sum/cnt; } const out=new Float32Array(arr.length); for(let x=0;x<w;x++) for(let y=0;y<h;y++){ let sum=0,cnt=0; for(let k=-radius;k<=radius;k++){ const yy=y+k; if(yy>=0 && yy<h){ sum+=tmp[yy*w+x]; cnt++; } } out[y*w+x]=sum/cnt; } return out; }
+
+// drawing pipeline
+function draw(){
+  ctx.clearRect(0,0,c.width,c.height);
+  if(shirtImg) ctx.drawImage(shirtImg,0,0,c.width,c.height); else drawCheckerBackground(ctx,c.width,c.height);
+  if(!patternImg){ return; }
+
+  const pw=c.width, ph=c.height;
+  const patternCanvas=document.createElement('canvas'); patternCanvas.width=pw; patternCanvas.height=ph;
+  const pctx=patternCanvas.getContext('2d'); pctx.clearRect(0,0,pw,ph);
+  pctx.save(); pctx.translate(patternState.x,patternState.y); pctx.rotate(patternState.rot*Math.PI/180); pctx.scale(patternState.scale,patternState.scale);
+  if(patternState.tiled){ const patt=pctx.createPattern(patternImg,'repeat'); pctx.fillStyle=patt; const fillW=pw*(1/patternState.scale)+1000; const fillH=ph*(1/patternState.scale)+1000; pctx.fillRect(-fillW/2,-fillH/2,fillW,fillH); }
+  else { const w=patternImg.naturalWidth||patternImg.width; const h=patternImg.naturalHeight||patternImg.height; const defaultScale=Math.min((pw*0.6)/w,(ph*0.6)/h); const drawW=w*defaultScale; const drawH=h*defaultScale; pctx.drawImage(patternImg,-drawW/2,-drawH/2,drawW,drawH); }
+  pctx.restore();
+
+  // if no displacement or no lumMap -> apply eraseMask & shirt mask then draw
+  if(!displaceToggle.checked || !lumMap){
+    const temp=document.createElement('canvas'); temp.width=pw; temp.height=ph; const tctx=temp.getContext('2d');
+    tctx.drawImage(pctx.canvas,0,0);
+    if(eraseMask.width && eraseMask.height){ tctx.globalCompositeOperation='destination-in'; tctx.drawImage(eraseMask,0,0); tctx.globalCompositeOperation='source-over'; }
+    if(maskCanvas){ tctx.globalCompositeOperation='destination-in'; tctx.drawImage(maskCanvas,0,0); tctx.globalCompositeOperation='source-over'; }
+    ctx.globalAlpha = patternState.alpha; ctx.globalCompositeOperation='multiply'; ctx.drawImage(temp,0,0); ctx.globalCompositeOperation='source-over'; ctx.globalAlpha=1;
+    return;
+  }
+
+  // displacement path
+  const pData = pctx.getImageData(0,0,pw,ph).data;
+  const displaced=document.createElement('canvas'); displaced.width=pw; displaced.height=ph; const dctx=displaced.getContext('2d');
+  const out=dctx.createImageData(pw,ph); const outData=out.data; const strength=Number(displaceStrength.value);
+  const gx=new Float32Array(pw*ph), gy=new Float32Array(pw*ph);
+  for(let y=0;y<ph;y++) for(let x=0;x<pw;x++){ const i=y*pw+x; const left=x>0?lumMap[i-1]:lumMap[i]; const right=x<pw-1?lumMap[i+1]:lumMap[i]; const top=y>0?lumMap[i-pw]:lumMap[i]; const bottom=y<ph-1?lumMap[i+pw]:lumMap[i]; gx[i]=right-left; gy[i]=bottom-top; }
+  for(let y=0;y<ph;y++) for(let x=0;x<pw;x++){ const i=y*pw+x; const dx=-gx[i]*(strength/50); const dy=-gy[i]*(strength/50); let sx=Math.round(x+dx), sy=Math.round(y+dy); if(sx<0) sx=0; if(sx>=pw) sx=pw-1; if(sy<0) sy=0; if(sy>=ph) sy=ph-1; const si=(sy*pw+sx)*4, oi=i*4; outData[oi]=pData[si]; outData[oi+1]=pData[si+1]; outData[oi+2]=pData[si+2]; outData[oi+3]=pData[si+3]; }
+  dctx.putImageData(out,0,0);
+
+  // apply eraseMask + shirt mask
+  const temp2=document.createElement('canvas'); temp2.width=pw; temp2.height=ph; const t2=temp2.getContext('2d');
+  t2.drawImage(displaced,0,0);
+  if(eraseMask.width && eraseMask.height){ t2.globalCompositeOperation='destination-in'; t2.drawImage(eraseMask,0,0); t2.globalCompositeOperation='source-over'; }
+  if(maskCanvas){ t2.globalCompositeOperation='destination-in'; t2.drawImage(maskCanvas,0,0); t2.globalCompositeOperation='source-over'; }
+  ctx.globalAlpha=patternState.alpha; ctx.globalCompositeOperation='multiply'; ctx.drawImage(temp2,0,0); ctx.globalCompositeOperation='source-over'; ctx.globalAlpha=1;
+}
+
+function drawCheckerBackground(context,w,h){ const size=16; for(let y=0;y<h;y+=size) for(let x=0;x<w;x+=size){ const even=((x/size)+(y/size))%2===0; context.fillStyle=even?'#f8f8f8':'#efefef'; context.fillRect(x,y,size,size); } }
+function syncUI(){ posX.value=Math.round(patternState.x); posY.value=Math.round(patternState.y); scaleEl.value=patternState.scale; rotationEl.value=patternState.rot; opacityEl.value=patternState.alpha; }
+
+// ERASER: push undo, undo, redo, reset
+function pushUndo(){ 
+  try{ 
+    const data = eraseMaskCtx.getImageData(0,0,eraseMask.width,eraseMask.height); 
+    undoStack.push(data); 
+    if(undoStack.length>UNDO_LIMIT) undoStack.shift(); 
+    undoBtn.disabled=false; 
+    // Clear redo stack when new action is performed
+    redoStack.length = 0;
+    redoBtn.disabled = true;
+  }catch(e){} 
+}
+
+function undoErase(){ 
+  if(undoStack.length===0) return; 
+  const currentState = eraseMaskCtx.getImageData(0,0,eraseMask.width,eraseMask.height);
+  redoStack.push(currentState);
+  redoBtn.disabled = false;
+  
+  const img = undoStack.pop(); 
+  eraseMaskCtx.putImageData(img,0,0); 
+  if(undoStack.length===0) undoBtn.disabled=true; 
+  draw(); 
+}
+
+function redoErase(){ 
+  if(redoStack.length===0) return; 
+  const currentState = eraseMaskCtx.getImageData(0,0,eraseMask.width,eraseMask.height);
+  undoStack.push(currentState);
+  undoBtn.disabled = false;
+  
+  const img = redoStack.pop(); 
+  eraseMaskCtx.putImageData(img,0,0); 
+  if(redoStack.length===0) redoBtn.disabled=true; 
+  draw(); 
+}
+
+undoBtn.addEventListener('click', undoErase);
+redoBtn.addEventListener('click', redoErase);
+resetEraseBtn.addEventListener('click', ()=>{ pushUndo(); eraseMaskCtx.clearRect(0,0,eraseMask.width,eraseMask.height); eraseMaskCtx.fillStyle='white'; eraseMaskCtx.fillRect(0,0,eraseMask.width,eraseMask.height); draw(); });
+
+// Eraser toggle - HANYA AKTIF/NON-AKTIF, TANPA PAINT
+eraserBtn.addEventListener('click', ()=>{ 
+  eraserActive = !eraserActive; 
+  eraserBtn.style.background = eraserActive ? '#0b66ff' : '#666'; 
+});
+
+// pointer tracking (multi-touch safe)
+c.addEventListener('pointerdown', e=>{
+  activePointers.add(e.pointerId);
+  // if multi-touch active, don't start erasing (allow pinch-zoom native)
+  if(activePointers.size > 1){
+    isErasing = false;
+    dragging = false;
+    lastPointerId = null;
+    return;
+  }
+
+  // single touch: decide whether to start drag or eraser
+  const rect=c.getBoundingClientRect(); 
+  const scaleX = c.width / rect.width;
+  const scaleY = c.height / rect.height;
+  const x = (e.clientX - rect.left) * scaleX;
+  const y = (e.clientY - rect.top) * scaleY;
+  
+  if(!eraserActive && patternImg){
+    // hit test for drag
+    const w = (patternImg.naturalWidth||patternImg.width) * Math.min((c.width*0.6)/(patternImg.naturalWidth||patternImg.width),(c.height*0.6)/(patternImg.naturalHeight||patternImg.height)) * patternState.scale;
+    const h = (patternImg.naturalHeight||patternImg.height) * Math.min((c.width*0.6)/(patternImg.naturalWidth||patternImg.width),(c.height*0.6)/(patternImg.naturalHeight||patternImg.height)) * patternState.scale;
+    const dx=x-patternState.x, dy=y-patternState.y; const theta=-patternState.rot*Math.PI/180;
+    const rx = dx*Math.cos(theta)-dy*Math.sin(theta), ry = dx*Math.sin(theta)+dy*Math.cos(theta);
+    if(Math.abs(rx) <= w/2+20 && Math.abs(ry) <= h/2+20){ dragging=true; dragOffset.x=dx; dragOffset.y=dy; c.setPointerCapture(e.pointerId); lastPointerId=e.pointerId; return; }
+  }
+
+  // Start erasing jika eraser aktif
+  if (eraserActive) {
+    ensureEraseMaskSize(c.width,c.height);
+    pushUndo();
+    isErasing = true;
+    lastPointerId = e.pointerId;
+    try{ c.setPointerCapture(e.pointerId); }catch(_){} 
+    doBrushStroke(x, y);
+  }
+});
+
+c.addEventListener('pointermove', e=>{
+  if(!activePointers.has(e.pointerId)) activePointers.add(e.pointerId);
+
+  if(activePointers.size > 1){ return; }
+
+  const rect=c.getBoundingClientRect(); 
+  const scaleX = c.width / rect.width;
+  const scaleY = c.height / rect.height;
+  const x = (e.clientX - rect.left) * scaleX;
+  const y = (e.clientY - rect.top) * scaleY;
+
+  if(dragging && !eraserActive){
+    patternState.x = x - dragOffset.x; 
+    patternState.y = y - dragOffset.y;
+    syncUI(); 
+    draw(); 
+    return;
+  }
+
+  if(!isErasing || lastPointerId !== e.pointerId || !eraserActive) return;
+  doBrushStroke(x, y);
+});
+
+c.addEventListener('pointerup', e=>{
+  activePointers.delete(e.pointerId);
+
+  if(lastPointerId === e.pointerId){
+    isErasing = false;
+    dragging = false;
+    try{ c.releasePointerCapture(e.pointerId); }catch(_){} 
+    lastPointerId = null;
+  }
+});
+c.addEventListener('pointercancel', e=>{
+  activePointers.delete(e.pointerId);
+  isErasing = false; dragging=false; lastPointerId=null;
+});
+
+// Brush drawing onto eraseMask - HANYA UNTUK ERASER
+function doBrushStroke(x, y){
+  if(!eraseMaskCtx || !eraserActive) return;
+  if(activePointers.size > 1) return;
+
+  const size = Number(brushSizeEl.value);
+  const hardness = Number(brushHardEl.value);
+
+  const b = document.createElement('canvas'); 
+  const bs=Math.max(8,Math.ceil(size)); 
+  b.width=bs; 
+  b.height=bs; 
+  const bctx=b.getContext('2d');
+  
+  // Brush untuk eraser
+  const g = bctx.createRadialGradient(bs/2,bs/2,0,bs/2,bs/2,bs/2);
+  g.addColorStop(0,'rgba(0,0,0,1)');
+  const stop = Math.max(0, Math.min(1, hardness));
+  g.addColorStop(stop,'rgba(0,0,0,1)'); 
+  g.addColorStop(1,'rgba(0,0,0,0)');
+  
+  bctx.clearRect(0,0,bs,bs); 
+  bctx.fillStyle=g; 
+  bctx.fillRect(0,0,bs,bs);
+
+  eraseMaskCtx.save();
+  eraseMaskCtx.globalCompositeOperation = 'destination-out';
+  eraseMaskCtx.drawImage(b, x - bs/2, y - bs/2, bs, bs);
+  eraseMaskCtx.globalCompositeOperation = 'source-over';
+  eraseMaskCtx.restore();
+
+  draw();
+}
+
+// slider listeners (also update patternState)
+[posX,posY,scaleEl,rotationEl,opacityEl,displaceStrength].forEach(el=>{
+  el.addEventListener('input', ()=>{
+    patternState.x = Number(posX.value);
+    patternState.y = Number(posY.value);
+    patternState.scale = Number(scaleEl.value);
+    patternState.rot = Number(rotationEl.value);
+    patternState.alpha = Number(opacityEl.value);
+    draw();
+  });
+});
+
+// +/- step buttons
+document.querySelectorAll('.step').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const targetId = btn.dataset.target;
+    const step = Number(btn.dataset.step);
+    const el = document.getElementById(targetId);
+    if(!el) return;
+    let val = Number(el.value);
+    val = val + step;
+    if(el.min !== undefined && el.min !== '') val = Math.max(Number(el.min), val);
+    if(el.max !== undefined && el.max !== '') val = Math.min(Number(el.max), val);
+    el.value = val;
+    el.dispatchEvent(new Event('input'));
+  });
+});
+
+// center/tile/reset
+centerBtn.addEventListener('click', ()=>{ patternState.x = c.width/2; patternState.y = c.height/2; syncUI(); draw(); });
+tileBtn.addEventListener('click', ()=>{ patternState.tiled = !patternState.tiled; tileBtn.textContent = patternState.tiled ? 'Tile: ON' : 'Toggle Tile'; draw(); });
+resetBtn.addEventListener('click', ()=>{ 
+  shirtImg=null; 
+  patternImg=null; 
+  maskCanvas=null; 
+  lumMap=null; 
+  patternState={x:c.width/2,y:c.height/2,scale:1,rot:0,alpha:1,tiled:false}; 
+  eraseMaskCtx.clearRect(0,0,eraseMask.width,eraseMask.height); 
+  eraseMaskCtx.fillStyle='white'; 
+  eraseMaskCtx.fillRect(0,0,eraseMask.width,eraseMask.height); 
+  undoStack.length=0; 
+  redoStack.length=0;
+  undoBtn.disabled=true; 
+  redoBtn.disabled=true;
+  document.getElementById('shirtFile').value=''; 
+  document.getElementById('patternFile').value=''; 
+  syncUI(); 
+  draw(); 
+});
+
+// download logic
+downloadBtn.addEventListener('click', ()=>{
+  if(!shirtImg && !patternImg) return;
+  const scaleFactor = 2; const tmp=document.createElement('canvas'); tmp.width=c.width*scaleFactor; tmp.height=c.height*scaleFactor;
+  const tctx=tmp.getContext('2d');
+  if(shirtImg) tctx.drawImage(shirtImg,0,0,tmp.width,tmp.height); else drawCheckerBackground(tctx,tmp.width,tmp.height);
+
+  // build high-res pattern
+  const pCanvas=document.createElement('canvas'); pCanvas.width=tmp.width; pCanvas.height=tmp.height; const pctx=pCanvas.getContext('2d');
+  pctx.save(); pctx.translate(patternState.x*scaleFactor, patternState.y*scaleFactor); pctx.rotate(patternState.rot*Math.PI/180); pctx.scale(patternState.scale, patternState.scale);
+  if(patternState.tiled){ const patt=pctx.createPattern(patternImg,'repeat'); pctx.fillStyle=patt; pctx.fillRect(-pCanvas.width,-pCanvas.height,pCanvas.width*2,pCanvas.height*2); }
+  else { const w=patternImg.naturalWidth||patternImg.width; const h=patternImg.naturalHeight||patternImg.height; const defaultScale=Math.min((pCanvas.width*0.6)/w,(pCanvas.height*0.6)/h); const drawW=w*defaultScale; const drawH=h*defaultScale; pctx.drawImage(patternImg,-drawW/2,-drawH/2,drawW,drawH); }
+  pctx.restore();
+
+  if(!displaceToggle.checked || !lumMap){
+    const eScaled=document.createElement('canvas'); eScaled.width=tmp.width; eScaled.height=tmp.height; const ectx=eScaled.getContext('2d'); ectx.drawImage(eraseMask,0,0,tmp.width,tmp.height);
+    const temp=document.createElement('canvas'); temp.width=tmp.width; temp.height=tmp.height; const tt=temp.getContext('2d'); tt.drawImage(pCanvas,0,0); tt.globalCompositeOperation='destination-in'; tt.drawImage(eScaled,0,0); tt.globalCompositeOperation='source-over';
+    if(maskCanvas){ const mScaled=document.createElement('canvas'); mScaled.width=tmp.width; mScaled.height=tmp.height; const mctx=mScaled.getContext('2d'); mctx.drawImage(maskCanvas,0,0,tmp.width,tmp.height); tt.globalCompositeOperation='destination-in'; tt.drawImage(mScaled,0,0); tt.globalCompositeOperation='source-over'; }
+    tctx.globalAlpha = patternState.alpha; tctx.globalCompositeOperation='multiply'; tctx.drawImage(temp,0,0); tctx.globalCompositeOperation='source-over'; tctx.globalAlpha=1;
+    const link=document.createElement('a'); link.download='mockup.png'; link.href=tmp.toDataURL('image/png'); link.click(); return;
+  }
+
+  // displacement high-res
+  const scaledLum = scaleLumMap(lumMap, c.width, c.height, tmp.width, tmp.height);
+  const pw=pCanvas.width, ph=pCanvas.height; const pDataHR=pctx.getImageData(0,0,pw,ph).data;
+  const displacedHR=document.createElement('canvas'); displacedHR.width=pw; displacedHR.height=ph; const dctxHR=displacedHR.getContext('2d'); const outHR=dctxHR.createImageData(pw,ph);
+  const outDataHR=outHR.data; const strength=Number(displaceStrength.value);
+  const gx=new Float32Array(pw*ph), gy=new Float32Array(pw*ph);
+  for(let y=0;y<ph;y++) for(let x=0;x<pw;x++){ const i=y*pw+x; const left = x>0?scaledLum[i-1]:scaledLum[i]; const right = x<pw-1?scaledLum[i+1]:scaledLum[i]; const top = y>0?scaledLum[i-pw]:scaledLum[i]; const bottom = y<ph-1?scaledLum[i+pw]:scaledLum[i]; gx[i]=right-left; gy[i]=bottom-top; }
+  for(let y=0;y<ph;y++) for(let x=0;x<pw;x++){ const i=y*pw+x; const dx=-gx[i]*(strength/50); const dy=-gy[i]*(strength/50); let sx=Math.round(x+dx), sy=Math.round(y+dy); if(sx<0) sx=0; if(sx>=pw) sx=pw-1; if(sy<0) sy=0; if(sy>=ph) sy=ph-1; const si=(sy*pw+sx)*4, oi=i*4; outDataHR[oi]=pDataHR[si]; outDataHR[oi+1]=pDataHR[si+1]; outDataHR[oi+2]=pDataHR[si+2]; outDataHR[oi+3]=pDataHR[si+3]; }
+  dctxHR.putImageData(outHR,0,0);
+
+  // apply erase mask scaled & shirt mask scaled
+  const eScaled=document.createElement('canvas'); eScaled.width=tmp.width; eScaled.height=tmp.height; const ectx=eScaled.getContext('2d'); ectx.drawImage(eraseMask,0,0,tmp.width,tmp.height);
+  const mScaled=document.createElement('canvas'); mScaled.width=tmp.width; mScaled.height=tmp.height; const mctx=mScaled.getContext('2d'); if(maskCanvas) mctx.drawImage(maskCanvas,0,0,tmp.width,tmp.height);
+  const temp2=document.createElement('canvas'); temp2.width=tmp.width; temp2.height=tmp.height; const tt=temp2.getContext('2d');
+  tt.drawImage(displacedHR,0,0,tmp.width,tmp.height); tt.globalCompositeOperation='destination-in'; tt.drawImage(eScaled,0,0); tt.globalCompositeOperation='source-over'; if(maskCanvas){ tt.globalCompositeOperation='destination-in'; tt.drawImage(mScaled,0,0); tt.globalCompositeOperation='source-over'; }
+  tctx.globalAlpha=patternState.alpha; tctx.globalCompositeOperation='multiply'; tctx.drawImage(temp2,0,0); tctx.globalCompositeOperation='source-over'; tctx.globalAlpha=1;
+  const link=document.createElement('a'); link.download='mockup.png'; link.href=tmp.toDataURL('image/png'); link.click();
+});
+
+// helper scale lum map
+function scaleLumMap(src, sw, sh, tw, th){ if(!src) return null; const out=new Float32Array(tw*th); for(let y=0;y<th;y++) for(let x=0;x<tw;x++){ const sx=Math.floor(x*sw/tw), sy=Math.floor(y*sh/th); out[y*tw+x] = src[sy*sw + sx]; } return out; }
+
+function syncUI(){ posX.value=Math.round(patternState.x); posY.value=Math.round(patternState.y); scaleEl.value=patternState.scale; rotationEl.value=patternState.rot; opacityEl.value=patternState.alpha; }
+function init(){ ensureEraseMaskSize(c.width,c.height); syncUI(); draw(); }
+init();
+</script>
+</body>
+</html>
